@@ -1,0 +1,122 @@
+[
+  {
+    "sku": "P001",
+    "internalCode": "INT001",
+    "name": "Mouse inalámbrico",
+    "description": "Mouse ergonómico con conexión Bluetooth",
+    "unitPrice": 25.99,
+    "quantity": 103
+  },
+  {
+    "sku": "P002",
+    "internalCode": "INT002",
+    "name": "Teclado mecánico",
+    "description": "Teclado RGB con switches Cherry MX",
+    "unitPrice": 89.99,
+    "quantity": 20
+  },
+  {
+    "sku": "P003",
+    "internalCode": "INT003",
+    "name": "Monitor 24 pulgadas",
+    "description": "Monitor Full HD IPS",
+    "unitPrice": 179.49,
+    "quantity": 135
+  },
+  {
+    "sku": "P004",
+    "internalCode": "INT004",
+    "name": "Auriculares",
+    "description": "Auriculares con cancelación de ruido",
+    "unitPrice": 49.99,
+    "quantity": 85
+  },
+  {
+    "sku": "P005",
+    "internalCode": "INT005",
+    "name": "Webcam HD",
+    "description": "Cámara web 1080p",
+    "unitPrice": 35.0,
+    "quantity": 81
+  },
+  {
+    "sku": "P006",
+    "internalCode": "INT006",
+    "name": "Silla ergonómica",
+    "description": "Silla de oficina ajustable",
+    "unitPrice": 220.0,
+    "quantity": 50
+  },
+  {
+    "sku": "P007",
+    "internalCode": "INT007",
+    "name": "Laptop 15”",
+    "description": "Notebook con 16 GB RAM y SSD",
+    "unitPrice": 1200.0,
+    "quantity": 34
+  },
+  {
+    "sku": "P008",
+    "internalCode": "INT008",
+    "name": "Base para notebook",
+    "description": "Base ajustable con ventilador",
+    "unitPrice": 29.99,
+    "quantity": 84
+  },
+  {
+    "sku": "P009",
+    "internalCode": "INT009",
+    "name": "Disco externo 1TB",
+    "description": "Almacenamiento USB 3.0",
+    "unitPrice": 75.5,
+    "quantity": 80
+  },
+  {
+    "sku": "P010",
+    "internalCode": "INT010",
+    "name": "Router Wi-Fi",
+    "description": "Router de doble banda",
+    "unitPrice": 58.0,
+    "quantity": 69
+  },
+  {
+    "sku": "ARROZ001",
+    "internalCode": "INT001",
+    "name": "Arroz Largo Fino 1kg",
+    "description": "Arroz largo fino en paquete de 1kg, ideal para comidas diarias",
+    "unitPrice": 1500,
+    "quantity": 50
+  },
+  {
+    "sku": "LECHE001",
+    "internalCode": "INT002",
+    "name": "Leche Entera 1L",
+    "description": "Leche entera larga vida en envase de 1 litro",
+    "unitPrice": 950,
+    "quantity": 100
+  },
+  {
+    "sku": "ACEITE001",
+    "internalCode": "INT003",
+    "name": "Aceite de Girasol 900ml",
+    "description": "Aceite de girasol en botella de 900ml",
+    "unitPrice": 2200,
+    "quantity": 40
+  },
+  {
+    "sku": "FIDEOS001",
+    "internalCode": "INT004",
+    "name": "Fideos Spaghetti 500g",
+    "description": "Paquete de fideos tipo spaghetti de 500 gramos",
+    "unitPrice": 800,
+    "quantity": 70
+  },
+  {
+    "sku": "HARINA001",
+    "internalCode": "INT005",
+    "name": "Harina de Trigo 1kg",
+    "description": "Harina de trigo común en paquete de 1kg",
+    "unitPrice": 1000,
+    "quantity": 60
+  }
+]

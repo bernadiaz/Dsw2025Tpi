@@ -2,7 +2,7 @@
 
 public record ProductModel
 {
-    public record Request
+    public record ProductRequest
         (
         string Sku,
         string InternalCode,
@@ -12,7 +12,7 @@ public record ProductModel
         int StockQuantity
         );
 
-    public record Response
+    public record ProductResponse
         (
         Guid ProductId,
         string Sku,

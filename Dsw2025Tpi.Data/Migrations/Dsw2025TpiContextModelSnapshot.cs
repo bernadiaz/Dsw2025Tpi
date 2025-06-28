@@ -82,8 +82,6 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.ToTable("Orders", (string)null);
                 });
 
@@ -111,8 +109,6 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("OrderItems", (string)null);
                 });
@@ -156,17 +152,6 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.ToTable("Products", (string)null);
                 });
 
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Order", b =>
-                {
-                    b.HasOne("Dsw2025Tpi.Domain.Entities.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.OrderItem", b =>
                 {
                     b.HasOne("Dsw2025Tpi.Domain.Entities.Order", null)
@@ -174,14 +159,6 @@ namespace Dsw2025Tpi.Data.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Dsw2025Tpi.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Order", b =>

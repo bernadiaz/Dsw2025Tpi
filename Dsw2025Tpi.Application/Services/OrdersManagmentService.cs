@@ -1,6 +1,7 @@
 ﻿using Dsw2025Ej15.Application.Dtos;
 using Dsw2025Ej15.Application.Exceptions;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using System;
@@ -8,55 +9,71 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 
 namespace Dsw2025Tpi.Application.Services
 {
-    public class OrdersManagmentService
+    public class OrdersManagmentService : IOrdersManagmentService 
     {
         private readonly IRepository _repository;
         public OrdersManagmentService(IRepository repository)
         {
             _repository = repository;
         }
-        public async Task<OrderModel.Response> AddOrder(OrderModel.Request request)
+        public async Task<OrderModel.OrderResponse> AddOrder(OrderModel.OrderRequest _request)
         {
-            var exist = await _repository.GetById<Customer>(request.CustomerId);
-            if (exist == null) throw new EntityNotFoundException($"El cliente con Id {request.CustomerId} no existe");
+            var _exist = await _repository.GetById<Customer>(_request.CustomerId);
+            if (_exist == null)
+                throw new EntityNotFoundException($"El cliente con Id {_request.CustomerId} no existe");
 
-            if (request.OrderItems == null || string.IsNullOrEmpty(request.ShippingAddress)
-               || string.IsNullOrEmpty(request.BillingAddress))
-            {
+            if (string.IsNullOrWhiteSpace(_request.ShippingAddress) || string.IsNullOrWhiteSpace(_request.BillingAddress))
                 throw new ArgumentException("Valores para el pedido no válidos");
-            }
 
-            foreach (var item in request.OrderItems)
+            var _orderItemsResponses = new List<OrderItemResponse>();
+            var _orderItems = new List<OrderItem>();
+
+            foreach (var _item in _request.OrderItems)
             {
-                var product = await _repository.GetById<Product>(item.ProductId);
-                if (product == null) throw new EntityNotFoundException($"No se encontró el producto con ID {item.ProductId}");
-                product.ReduceStock(item.Quantity);
-                await _repository.Update(product);
+                var _product = await _repository.GetById<Product>(_item.ProductId);
+                if (_product == null)
+                    throw new EntityNotFoundException($"No se encontró el producto con ID {_item.ProductId}");
+
+                if ((_item.Quantity < 0) ||
+                    string.IsNullOrWhiteSpace(_item.Name) ||
+                    string.IsNullOrWhiteSpace(_item.Description) ||
+                    _item.UnitPrice <= 0)
+                {
+                    throw new ArgumentException("Valores para el pedido no válidos");
+                }
+
+                _product.ReduceStock(_item.Quantity);
+                await _repository.Update(_product);
+
+                var _orderItem = new OrderItem(_item.Quantity, _item.UnitPrice, _item.ProductId);
+                _orderItems.Add(_orderItem);
+
+                _orderItemsResponses.Add(new OrderItemResponse(
+                    _item.ProductId,
+                    _item.Quantity,
+                    _product.Name!,
+                    _product.Description!,
+                    _product.CurrentUnitPrice
+                ));
             }
 
-            var orderItems = new List<OrderItem>();
-            orderItems = [];
-            var order = new Order(request.CustomerId, request.ShippingAddress, request.BillingAddress, orderItems);
+            var _order = new Order(_request.CustomerId, _request.ShippingAddress, _request.BillingAddress, _orderItems);
 
-            foreach (var item in request.OrderItems)
-            {
-                var orderItem = new OrderItem(item.Quantity, item.Product!, order.Id);
-                orderItems.Add(orderItem);
-                await _repository.Add(orderItem);
-            }
+            await _repository.Add(_order);
 
-            await _repository.Add(order);
-            return new OrderModel.Response(
-                order.Id,
-                order.CustomerId,
-                order.ShippingAddress,
-                order.BillingAddress,
-                orderItems,
-                order.TotalAmount
+            return new OrderModel.OrderResponse(
+                _order.Id,
+                _order.CustomerId,
+                _order.ShippingAddress,
+                _order.BillingAddress,
+                _orderItemsResponses,
+                _order.TotalAmount
             );
         }
+
     }
 }
