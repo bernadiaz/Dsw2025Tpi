@@ -63,6 +63,20 @@ public class Program
         });
         builder.Services.AddHealthChecks();
 
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        {
+            options.Password = new PasswordOptions
+            {
+                RequiredLength = 8
+                //requisitos como caracteres especiales, mayusculas, etc. ya estan puestos como true por default
+                //RequireDigit = true,
+                //RequireUppercase = true,
+                //RequireNonAlphanumeric = true
+            };
+        })
+        .AddEntityFrameworkStores<AuthenticationContext>()
+        .AddDefaultTokenProviders();
+
         var jwtConfig = builder.Configuration.GetSection("Jwt");
         var keyText = jwtConfig["Key"] ?? throw new ArgumentNullException("JWT Key");
         var key = Encoding.UTF8.GetBytes(keyText);
@@ -105,20 +119,6 @@ public class Program
         builder.Services.AddTransient<IProductsManagementService, ProductsManagementService>();
         builder.Services.AddTransient<IOrdersManagmentService, OrdersManagmentService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
-
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-        {
-            options.Password = new PasswordOptions
-            {
-                RequiredLength = 8
-                //requisitos como caracteres especiales, mayusculas, etc. ya estan puestos como true por default
-                //RequireDigit = true,
-                //RequireUppercase = true,
-                //RequireNonAlphanumeric = true
-            };
-        })
-        .AddEntityFrameworkStores<AuthenticationContext>()
-        .AddDefaultTokenProviders();
 
         builder.Services.AddDbContext<AuthenticationContext>(options =>
         {
