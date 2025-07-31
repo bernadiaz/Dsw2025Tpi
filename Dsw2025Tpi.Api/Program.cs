@@ -1,4 +1,15 @@
 
+using Dsw2025Ej15.Application.Services;
+using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Data.Helpers;
+using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 namespace Dsw2025Tpi.Api;
 
 public class Program
@@ -14,6 +25,22 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
+
+        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
+        {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiEntities"));
+            options.UseSeeding((c, t) =>
+            {
+                ((Dsw2025TpiContext)c).SeedWork<Customer>("Sources\\customer.json");
+                ((Dsw2025TpiContext)c).SeedWork<Product>("Sources\\product.json");
+                /*((Dsw2025TpiContext)c).SeedWork<Order>("Sources\\order.json");
+                ((Dsw2025TpiContext)c).SeedWork<OrderItem>("Sources\\orderitem.json");*/
+            });
+        });
+
+        builder.Services.AddScoped<IRepository, EfRepository>();
+        builder.Services.AddTransient<IProductsManagementService, ProductsManagementService>();
+        builder.Services.AddTransient<IOrdersManagmentService, OrdersManagmentService>();
 
         var app = builder.Build();
 
