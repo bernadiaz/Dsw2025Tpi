@@ -19,7 +19,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public async Task<IActionResult> GetProducts()
     {
         var _products = await _service.GetProducts();
