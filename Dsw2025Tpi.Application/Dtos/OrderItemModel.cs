@@ -20,6 +20,7 @@ public record OrderItemModel
     public record OrderItemResponse
         (
         Guid ProductId,
+        OrderStatus Status,
         int Quantity,
         string Name,
         string Description,

@@ -59,6 +59,7 @@ public class OrdersManagmentService : IOrdersManagmentService
 
         return new OrderModel.OrderResponse(
             order.Id,
+            order.Status,
             order.CustomerId,
             order.ShippingAddress,
             order.BillingAddress,
@@ -69,7 +70,7 @@ public class OrdersManagmentService : IOrdersManagmentService
 
     public async Task<IEnumerable<OrderModel.OrderResponse>> GetOrders(string? status, Guid? customerId, int pageNumber, int pageSize)
     {
-        var allOrders = await _repository.GetAll<Order>();
+        var allOrders = await _repository.GetAll<Order>("OrderItems.Product") ?? new List<Order>();
         var filtered = allOrders.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(status) &&
@@ -90,14 +91,15 @@ public class OrdersManagmentService : IOrdersManagmentService
 
         return paged.Select(order => new OrderModel.OrderResponse(
             order.Id,
+            order.Status,
             order.CustomerId,
             order.ShippingAddress!,
             order.BillingAddress!,
             order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
                 oi.ProductId,
                 oi.Quantity,
-                "",
-                "",
+                oi.Product?.Name ?? "",
+                oi.Product?.Description ?? "",
                 oi.UnitPrice)).ToList(),
             order.TotalAmount
         ));
@@ -105,20 +107,21 @@ public class OrdersManagmentService : IOrdersManagmentService
 
     public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
     {
-        var order = await _repository.GetById<Order>(id);
+        var order = await _repository.GetById<Order>(id, "OrderItems.Product");
         if (order == null)
             return null;
 
         return new OrderModel.OrderResponse(
             order.Id,
+            order.Status,
             order.CustomerId,
             order.ShippingAddress!,
             order.BillingAddress!,
             order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
                 oi.ProductId,
                 oi.Quantity,
-                "",
-                "",
+                oi.Product?.Name ?? "",
+                oi.Product?.Description ?? "",
                 oi.UnitPrice)).ToList(),
             order.TotalAmount
         );
@@ -126,7 +129,7 @@ public class OrdersManagmentService : IOrdersManagmentService
 
     public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, string newStatus)
     {
-        var order = await _repository.GetById<Order>(id);
+        var order = await _repository.GetById<Order>(id, "OrderItems.Product");
         if (order == null)
             throw new EntityNotFoundException("Orden no encontrada.");
 
@@ -138,14 +141,15 @@ public class OrdersManagmentService : IOrdersManagmentService
 
         return new OrderModel.OrderResponse(
             order.Id,
+            order.Status,
             order.CustomerId,
             order.ShippingAddress!,
             order.BillingAddress!,
             order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
                 oi.ProductId,
                 oi.Quantity,
-                "",
-                "",
+                oi.Product?.Name ?? "",
+                oi.Product?.Description ?? "",
                 oi.UnitPrice)).ToList(),
             order.TotalAmount
         );

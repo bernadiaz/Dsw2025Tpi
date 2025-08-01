@@ -42,6 +42,16 @@ public class Program
         builder.Services.AddTransient<IProductsManagementService, ProductsManagementService>();
         builder.Services.AddTransient<IOrdersManagmentService, OrdersManagmentService>();
 
+        //Para cuando lo quieramos conectar con el front
+        builder.Services.AddCors(options => 
+        {
+            options.AddPolicy("PermitirFrontend", policy =>
+                policy.WithOrigins("http://localhost:3000")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod());
+        });
+
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -53,6 +63,8 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseCors("PermitirFrontend");
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();

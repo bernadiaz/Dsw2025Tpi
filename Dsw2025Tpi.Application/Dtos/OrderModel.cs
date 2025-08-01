@@ -1,4 +1,5 @@
-﻿using Dsw2025Tpi.Domain.Entities;
+﻿using System.Text.Json.Serialization;
+using Dsw2025Tpi.Domain.Entities;
 using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 
 namespace Dsw2025Tpi.Application.Dtos;
@@ -30,6 +31,8 @@ public static class OrderModel
 
     public record OrderResponse(
         Guid OrderId,
+        [property: JsonConverter(typeof(JsonStringEnumConverter))]
+        OrderStatus status,
         Guid CustomerId,
         string? ShippingAddress,
         string? BillingAddress,
