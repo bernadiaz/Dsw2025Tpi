@@ -1,5 +1,6 @@
 
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using Dsw2025Ej15.Application.Services;
 using Dsw2025Tpi.Application.Interfaces;
@@ -97,7 +98,8 @@ public class Program
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtConfig["Issuer"],
                     ValidAudience = jwtConfig["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    RoleClaimType = ClaimTypes.Role
                 };
             });
 
@@ -125,7 +127,23 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiEntities"));
         });
 
+        //Para cuando lo quieramos conectar con el front
+        builder.Services.AddCors(options => 
+        {
+            options.AddPolicy("PermitirFrontend", policy =>
+                policy.WithOrigins("http://localhost:3000")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod());
+        });
+
+
         var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            SeedData.SeedRoles(services).GetAwaiter().GetResult();
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -136,6 +154,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseCors("PermitirFrontend");
         app.UseAuthentication();
         app.UseAuthorization();
 

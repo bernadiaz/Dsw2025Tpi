@@ -1,6 +1,7 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +38,8 @@ public class AuthenticationController : ControllerBase
         {
             return Unauthorized("Usuario o contraseña incorrectos");
         }
-        var token = _jwtTokenService.GenerateToken(user.UserName/*, user.Role*/);
+        var rol = await _userManager.GetRolesAsync(user);
+        var token = _jwtTokenService.GenerateToken(user.UserName, rol.FirstOrDefault());
         return Ok(new {token});
     }
 
@@ -57,6 +59,15 @@ public class AuthenticationController : ControllerBase
             return BadRequest(result.Errors);
         }
         //si se quisiera agregar un rol al usuario, se haría aquí
+        var role = string.IsNullOrWhiteSpace(request.role) ? "user" : request.role;
+        // Verificar si el rol existe, y crearlo si no
+        //if (!await _roleManager.RoleExistsAsync(role))
+        //{
+        //    await _roleManager.CreateAsync(new IdentityRole(role));
+        //}
+
+        // Asignar el rol al usuario
+        await _userManager.AddToRoleAsync(user, role);
         //tmb opcionalmente se podria agregar un mail de confirmacion
         return Ok("Usuario registrado exitosamente");
     }

@@ -19,7 +19,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    //[AllowAnonymous]
+    [AllowAnonymous]
     public async Task<IActionResult> GetProducts()
     {
         var _products = await _service.GetProducts();
@@ -31,6 +31,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetProductById(Guid id)
     {
         var _product = await _service.GetProductById(id);

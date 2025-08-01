@@ -1,30 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 using Dsw2025Tpi.Domain.Entities;
 using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 
 namespace Dsw2025Tpi.Application.Dtos;
 
-public record OrderModel
+public static class OrderModel
 {
-    public record OrderRequest
-        (
+    public record OrderRequest(
         Guid CustomerId,
         string? ShippingAddress,
         string? BillingAddress,
         List<OrderItemRequest> OrderItems
-        );
+    );
 
-    public record OrderResponse
-        (
+    public record OrderItemRequest(
+        Guid ProductId,
+        int Quantity,
+        string Name,
+        string Description,
+        decimal UnitPrice
+    );
+
+    public record OrderItemResponse(
+        Guid ProductId,
+        int Quantity,
+        string Name,
+        string Description,
+        decimal UnitPrice
+    );
+
+    public record OrderResponse(
         Guid OrderId,
+        [property: JsonConverter(typeof(JsonStringEnumConverter))]
+        OrderStatus status,
         Guid CustomerId,
         string? ShippingAddress,
         string? BillingAddress,
         List<OrderItemResponse> OrderItems,
         decimal TotalAmount
-        );
+    );
+
+    public record StatusUpdateRequest(
+        string NewStatus
+    );
 }
+
