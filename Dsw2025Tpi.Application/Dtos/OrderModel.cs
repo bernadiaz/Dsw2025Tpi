@@ -15,10 +15,10 @@ public static class OrderModel
 
     public record OrderItemRequest(
         Guid ProductId,
-        int Quantity,
-        string Name,
-        string Description,
-        decimal UnitPrice
+        int Quantity
+        //string Name,
+        //string Description,
+        //decimal UnitPrice
     );
 
     public record OrderItemResponse(

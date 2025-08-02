@@ -25,6 +25,9 @@ public class OrdersManagmentService : IOrdersManagmentService
         if (string.IsNullOrWhiteSpace(request.ShippingAddress) || string.IsNullOrWhiteSpace(request.BillingAddress))
             throw new ArgumentException("Dirección de envío o facturación inválida.");
 
+        if (request.OrderItems == null || !request.OrderItems.Any())
+            throw new InvalidOperationException("No se puede crear una orden sin ítems.");
+
         var orderItems = new List<OrderItem>();
         var orderItemResponses = new List<OrderModel.OrderItemResponse>();
 
@@ -34,7 +37,7 @@ public class OrdersManagmentService : IOrdersManagmentService
             if (product == null)
                 throw new EntityNotFoundException($"Producto con ID {item.ProductId} no encontrado.");
 
-            if (item.Quantity <= 0 || item.UnitPrice <= 0)
+            if (item.Quantity <= 0)
                 throw new ArgumentException("Cantidad o precio inválido.");
 
             if (product.StockQuantity < item.Quantity)
@@ -43,7 +46,7 @@ public class OrdersManagmentService : IOrdersManagmentService
             product.ReduceStock(item.Quantity);
             await _repository.Update(product);
 
-            var orderItem = new OrderItem(item.Quantity, item.UnitPrice, item.ProductId);
+            var orderItem = new OrderItem(item.Quantity, product.CurrentUnitPrice, item.ProductId);
             orderItems.Add(orderItem);
 
             orderItemResponses.Add(new OrderModel.OrderItemResponse(
