@@ -59,7 +59,7 @@ public class AuthenticationController : ControllerBase
             return BadRequest(result.Errors);
         }
         //si se quisiera agregar un rol al usuario, se haría aquí
-        var role = string.IsNullOrWhiteSpace(request.role) ? "user" : request.role;
+        var role = string.IsNullOrWhiteSpace(request.role) ? "cliente" : request.role;
         // Verificar si el rol existe, y crearlo si no
         //if (!await _roleManager.RoleExistsAsync(role))
         //{

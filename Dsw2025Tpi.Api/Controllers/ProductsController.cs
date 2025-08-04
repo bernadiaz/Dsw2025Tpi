@@ -65,7 +65,7 @@ public class ProductsController : ControllerBase
         }
     }
 
-    [HttpPatch("{id}")]
+    [HttpPatch("Disable/{id}")]
     public async Task<IActionResult> DisableProduct(Guid id)
     {
         try
