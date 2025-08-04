@@ -40,6 +40,11 @@ public class OrdersManagmentService : IOrdersManagmentService
             if (item.Quantity <= 0)
                 throw new ArgumentException("Cantidad o precio inválido.");
 
+            if (!product.IsActive)
+            {
+                throw new InvalidOperationException($"Producto desactivado: {product.Name}, no se puede agregar la orde");
+            }
+
             if (product.StockQuantity < item.Quantity)
                 throw new InvalidOperationException($"Stock insuficiente para el producto {product.Name}");
 
