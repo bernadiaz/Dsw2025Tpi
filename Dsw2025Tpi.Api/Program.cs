@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using AuthenticationService = Dsw2025Tpi.Application.Services.AuthService;
@@ -29,7 +30,13 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-
+        builder.Services.AddLogging(config =>
+        {
+            config.AddConsole();
+            //.AddFilter("Microsoft.EntityFramework", LogLevel.Error)//configurado desde appsettings
+            //config.AddDebug();
+            config.AddFile(builder.Configuration.GetSection("LogPath").Value, minimumLevel: LogLevel.Debug);
+        });
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();

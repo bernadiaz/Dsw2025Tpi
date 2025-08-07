@@ -1,4 +1,5 @@
-﻿using Dsw2025Tpi.Application.Dtos;
+﻿using Dsw2025Ej15.Application.Services;
+using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,14 +16,16 @@ public class AuthenticationController : ControllerBase
     private readonly SignInManager<IdentityUser> _signInManager;//como manager
     private readonly JwtTokenService _jwtTokenService;
     private readonly IAuthService _authService;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthenticationController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-        JwtTokenService jwtTokenService, IAuthService authService)
+        JwtTokenService jwtTokenService, IAuthService authService, ILogger<AuthService> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
         _authService = authService;
+        _logger = logger;
     }
 
     [HttpPost("login")]
@@ -31,15 +34,18 @@ public class AuthenticationController : ControllerBase
         var user = await _userManager.FindByNameAsync(request.Username);
         if (user == null)
         {
+            _logger.LogWarning("Intento fallido de login para el usuario {username}", request.Username);
             return Unauthorized("Usuario o contraseña incorrectos");
         }
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (!result.Succeeded)
         {
+            _logger.LogWarning("Intento fallido de login para el usuario {username}", request.Username);
             return Unauthorized("Usuario o contraseña incorrectos");
         }
         var rol = await _userManager.GetRolesAsync(user);
         var token = _jwtTokenService.GenerateToken(user.UserName, rol.FirstOrDefault());
+        _logger.LogInformation("Usuario {username} logueado exitosamente", user.UserName);
         return Ok(new {token});
     }
 
@@ -49,6 +55,7 @@ public class AuthenticationController : ControllerBase
         var (isValid, errors) = await _authService.ValidateRegistrationAsync(request);
         if (!isValid)
         {
+            _logger.LogWarning("Registro fallido para el usuario {username}: {errors}", request.Username, string.Join(", ", errors));
             return BadRequest(new { errors });
         }
         // Crear nuevo usuario
@@ -56,9 +63,10 @@ public class AuthenticationController : ControllerBase
         var result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
         {
+            _logger.LogWarning("Error al crear el usuario {username}: {errors}", request.Username, string.Join(", ", result.Errors.Select(e => e.Description)));
             return BadRequest(result.Errors);
         }
-        //si se quisiera agregar un rol al usuario, se haría aquí
+        
         var role = string.IsNullOrWhiteSpace(request.role) ? "user" : request.role;
         // Verificar si el rol existe, y crearlo si no
         //if (!await _roleManager.RoleExistsAsync(role))
@@ -68,7 +76,7 @@ public class AuthenticationController : ControllerBase
 
         // Asignar el rol al usuario
         await _userManager.AddToRoleAsync(user, role);
-        //tmb opcionalmente se podria agregar un mail de confirmacion
+        _logger.LogInformation("Usuario {username} registrado exitosamente con rol {role}", request.Username, role);
         return Ok("Usuario registrado exitosamente");
     }
 }
