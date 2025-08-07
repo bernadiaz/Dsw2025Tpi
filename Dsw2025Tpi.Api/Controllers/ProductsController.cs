@@ -13,9 +13,12 @@ namespace Dsw2025Tpi.Api.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IProductsManagementService _service;
-    public ProductsController(IProductsManagementService _productsManagementService)
+    private readonly ILogger<ProductsController> _logger;
+
+    public ProductsController(IProductsManagementService _productsManagementService, ILogger<ProductsController> logger)
     {
         _service = _productsManagementService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -25,6 +28,7 @@ public class ProductsController : ControllerBase
         var _products = await _service.GetProducts();
         if (_products == null || !_products.Any())
         {
+            _logger.LogInformation("No se encontraron productos");
             return NoContent();
         }
         return Ok(_products);
@@ -37,6 +41,7 @@ public class ProductsController : ControllerBase
         var _product = await _service.GetProductById(id);
         if (_product == null)
         {
+            _logger.LogInformation("No se encontró el producto con Id: {Id}", id);
             return NotFound($"No se encontró el producto con Id {id}");
         }
         return Ok(_product);
@@ -52,15 +57,18 @@ public class ProductsController : ControllerBase
         }
         catch (ArgumentException ae)
         {
+            _logger.LogWarning("Error al agregar el producto: {Message}", ae.Message);
             return BadRequest(ae.Message);
         }
         catch (DuplicatedEntityException dee)
         {
+            _logger.LogWarning("Error al agregar el producto: {Message}", dee.Message);
             return Conflict(dee.Message);
 
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error al guardar el producto");
             return Problem("Se produjo un error al guardar el producto");
         }
     }
@@ -73,12 +81,14 @@ public class ProductsController : ControllerBase
             var _product = await _service.DeleteProduct(id);
             if (_product == null)
             {
+                _logger.LogInformation("No se encontró el producto con Id: {Id}", id);
                 return NotFound($"No se encontró el producto con Id {id}");
             }
             return Ok(_product);
         }
         catch (EntityNotFoundException enfe)
         {
+            _logger.LogError(enfe, "Error al eliminar el producto");
             return NotFound(enfe.Message);
         }
         catch (ArgumentException ae)
@@ -87,7 +97,8 @@ public class ProductsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return Problem("Se produjo un error al actualizar el producto");
+            _logger.LogError(ex, "Error al eliminar el producto");
+            return Problem("Se produjo un error al eliminar el producto");
         }
     }
 
@@ -101,18 +112,22 @@ public class ProductsController : ControllerBase
         }
         catch (EntityNotFoundException enfe)
         {
+            _logger.LogError(enfe, "Error al actualizar el producto: {message}", enfe.Message);
             return NotFound(enfe.Message);
         }
         catch (ArgumentException ae)
         {
+            _logger.LogError(ae, "Error al actualizar el producto: {message}", ae.Message);
             return BadRequest(ae.Message);
         }
         catch (DuplicatedEntityException de)
         {
+            _logger.LogError(de, "Error al actualizar el producto: {message}", de.Message);
             return BadRequest(de.Message);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error al actualizar el producto");
             return Problem("Se produjo un error al actualizar el producto");
         }
     }
