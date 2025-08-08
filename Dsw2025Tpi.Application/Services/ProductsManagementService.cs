@@ -22,7 +22,7 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ProductResponse?> GetProductById(Guid _id)
     {
         _logger.LogInformation("Consulta de producto con Id: {Id}", _id);
-        var _product = await _repository.GetById<Product>(_id);
+        //var _product = await _repository.GetById<Product>(_id);
         var _product = (await _repository.GetFiltered<Product>(
             p => p.Id == _id && p.IsActive))?.FirstOrDefault();
         return _product != null ?
