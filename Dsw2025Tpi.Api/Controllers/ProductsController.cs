@@ -23,9 +23,9 @@ public class ProductsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetProducts()
+    public async Task<IActionResult> GetProducts(int pageNumber, int pageSize)
     {
-        var _products = await _service.GetProducts();
+        var _products = await _service.GetProducts(pageNumber, pageSize);
         if (_products == null || !_products.Any())
         {
             _logger.LogInformation("No se encontraron productos");

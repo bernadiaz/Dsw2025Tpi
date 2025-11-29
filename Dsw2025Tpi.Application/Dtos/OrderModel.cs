@@ -34,6 +34,7 @@ public static class OrderModel
         [property: JsonConverter(typeof(JsonStringEnumConverter))]
         OrderStatus status,
         Guid CustomerId,
+        string? CustomerName,
         string? ShippingAddress,
         string? BillingAddress,
         List<OrderItemResponse> OrderItems,

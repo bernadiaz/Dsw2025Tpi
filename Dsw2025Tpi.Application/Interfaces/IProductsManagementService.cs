@@ -10,7 +10,7 @@ namespace Dsw2025Tpi.Application.Interfaces;
 public interface IProductsManagementService
 {
     public Task<ProductModel.ProductResponse?> GetProductById(Guid _id);
-    public Task<IEnumerable<ProductModel.ProductResponse>?> GetProducts();
+    public Task<IEnumerable<ProductModel.ProductResponse>?> GetProducts(int pageNumber, int pageSize);
     public Task<ProductModel.ProductResponse> AddProduct(ProductModel.ProductRequest _request);
     public Task<ProductModel.ProductResponse> DeleteProduct(Guid _id);
     public Task<ProductModel.ProductResponse> UpdateProduct(Guid _id, ProductModel.ProductRequest _request);

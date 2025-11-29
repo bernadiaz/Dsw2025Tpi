@@ -16,6 +16,7 @@ public class Order : EntityBase
     public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     public OrderStatus Status { get; set; } = OrderStatus.PENDING;
     public Order() { }
+    public virtual Customer? Customer { get; set; }
     public Order(Guid _customerId, string? _shippingAddress, string? _billingAddress, List<OrderItem> _orderItems)
     {
         CustomerId = _customerId;

@@ -96,6 +96,7 @@ public class OrdersManagmentService : IOrdersManagmentService
             order.Id,
             order.Status,
             order.CustomerId,
+            customer.Name,
             order.ShippingAddress,
             order.BillingAddress,
             orderItemResponses,
@@ -106,7 +107,7 @@ public class OrdersManagmentService : IOrdersManagmentService
     public async Task<IEnumerable<OrderModel.OrderResponse>> GetOrders(string? status, Guid? customerId, int pageNumber, int pageSize)
     {
         _logger.LogInformation("Consulta de todas las órdenes");
-        var allOrders = await _repository.GetAll<Order>("OrderItems.Product") ?? new List<Order>();
+        var allOrders = await _repository.GetAll<Order>("OrderItems.Product", "Customer") ?? new List<Order>();
         var filtered = allOrders.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(status) &&
@@ -129,6 +130,7 @@ public class OrdersManagmentService : IOrdersManagmentService
             order.Id,
             order.Status,
             order.CustomerId,
+            order.Customer?.Name ?? "",
             order.ShippingAddress!,
             order.BillingAddress!,
             order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
@@ -152,6 +154,7 @@ public class OrdersManagmentService : IOrdersManagmentService
             order.Id,
             order.Status,
             order.CustomerId,
+            order.Customer?.Name ?? "",
             order.ShippingAddress!,
             order.BillingAddress!,
             order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
@@ -188,6 +191,7 @@ public class OrdersManagmentService : IOrdersManagmentService
             order.Id,
             order.Status,
             order.CustomerId,
+            order.Customer?.Name ?? "",
             order.ShippingAddress!,
             order.BillingAddress!,
             order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(

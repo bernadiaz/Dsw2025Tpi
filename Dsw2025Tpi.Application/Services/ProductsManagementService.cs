@@ -30,11 +30,25 @@ public class ProductsManagementService : IProductsManagementService
             _product.Name!, _product.Description!, _product.CurrentUnitPrice,
             _product.StockQuantity, _product.IsActive) : null;
     }
-    public async Task<IEnumerable<ProductModel.ProductResponse>?> GetProducts()
+    public async Task<IEnumerable<ProductModel.ProductResponse>?> GetProducts(int pageNumber, int pageSize)
     {
         _logger.LogInformation("Consulta de todos los productos");
-        var _products = await _repository.GetFiltered<Product>(_p => _p.IsActive);
-        return _products?.Select(_p => new ProductModel.ProductResponse(_p.Id, _p.Sku!, _p.InternalCode!,
+        //var _products = await _repository.GetFiltered<Product>(_p => _p.IsActive); //aca para filtrar y que aparezcan solo los activos
+        var allProducts = await _repository.GetAll<Product>();
+        var filtered = allProducts.AsQueryable();
+
+        //if (!string.IsNullOrWhiteSpace(status) &&
+        //    Enum.TryParse<ProductStatus>(status, true, out var parsedStatus))
+        //{
+        //    filtered = filtered.Where(o => o.Status == parsedStatus);
+        //}
+
+        var paged = filtered
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return paged.Select(_p => new ProductModel.ProductResponse(_p.Id, _p.Sku!, _p.InternalCode!,
                 _p.Name!, _p.Description!, _p.CurrentUnitPrice, _p.StockQuantity, _p.IsActive));
     }
 
