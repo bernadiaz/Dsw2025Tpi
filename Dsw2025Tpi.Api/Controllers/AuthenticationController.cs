@@ -49,7 +49,7 @@ public class AuthenticationController : ControllerBase
             _logger.LogError("No se puede generar el token: username o roles inválidos. User: {@user}, Roles: {@rol}", user, rol);
             throw new InvalidOperationException("No se puede generar el token por datos incompletos.");
         } 
-        var token = _jwtTokenService.GenerateToken(user.UserName, rol.FirstOrDefault());
+        var token = _jwtTokenService.GenerateToken(user.UserName, rol.FirstOrDefault(), Guid.Parse(user.Id));
         _logger.LogInformation("Usuario {username} logueado exitosamente", user.UserName);
         return Ok(new {token});
     }
