@@ -5,6 +5,8 @@ using Dsw2025Tpi.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Domain.Entities;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
@@ -17,15 +19,17 @@ public class AuthenticationController : ControllerBase
     private readonly JwtTokenService _jwtTokenService;
     private readonly IAuthService _authService;
     private readonly ILogger<AuthService> _logger;
+    private readonly Dsw2025TpiContext _businessContext;
 
     public AuthenticationController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-        JwtTokenService jwtTokenService, IAuthService authService, ILogger<AuthService> logger)
+        JwtTokenService jwtTokenService, IAuthService authService, ILogger<AuthService> logger, Dsw2025TpiContext businessContext)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
         _authService = authService;
         _logger = logger;
+        _businessContext = businessContext;
     }
 
     [HttpPost("login")]
@@ -71,6 +75,36 @@ public class AuthenticationController : ControllerBase
             _logger.LogWarning("Error al crear el usuario {username}: {errors}", request.Username, string.Join(", ", result.Errors.Select(e => e.Description)));
             return BadRequest(result.Errors);
         }
+
+        try
+        {
+            // Creamos la entidad Customer usando EL MISMO ID que generó Identity
+            var customer = new Customer
+            {
+                // Parseamos el string Id de Identity a Guid para tu entidad Customer
+                Id = Guid.Parse(user.Id),
+
+                // Mapeamos los datos. 
+                // IMPORTANTE: Tu DB requiere Name y PhoneNumber. Si no vienen en el request,
+                // ponemos valores por defecto para evitar error 500.
+                Name = !string.IsNullOrEmpty(request.Name) ? request.Name : request.Username,
+                Email = request.Email,
+                PhoneNumber = !string.IsNullOrEmpty(request.PhoneNumber) ? request.PhoneNumber : "Sin registrar"
+            };
+
+            _businessContext.Customers.Add(customer);
+            await _businessContext.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            // Si falla la creación del cliente, deberíamos borrar el usuario de identidad
+            // para no dejar datos inconsistentes (Opcional pero recomendado)
+            await _userManager.DeleteAsync(user);
+
+            _logger.LogError(ex, "Error al crear el perfil de cliente para {user}", request.Username);
+            return StatusCode(500, "El usuario se creó pero hubo un error al generar el perfil de cliente. Intente nuevamente.");
+        }
+
         //si se quisiera agregar un rol al usuario, se haría aquí
         var role = string.IsNullOrWhiteSpace(request.role) ? "cliente" : request.role;
         // Verificar si el rol existe, y crearlo si no

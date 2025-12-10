@@ -30,7 +30,7 @@ public class JwtTokenService
         new Claim(JwtRegisteredClaimNames.Sub, username),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim(ClaimTypes.Role, role.ToUpper()) ,//si se quisiera agregar un rol al token, no olvidar agregarlo tmb en generateToken(username, role) y en el endpoint de creación del token
-	    new Claim(ClaimTypes.NameIdentifier, Id.ToString())
+	    new Claim("uid", Id.ToString())
         //definimos claims, q el token usa. Se pueden llegar a definir más
         };
 
